@@ -16,7 +16,7 @@ log_dir=/var/www/$domain_name/logs
 if [ ${#localsiteport} -eq 0 ]; then
 	echo -n "Creating www dir \n"
 	sudo mkdir -p $deploy_dir
-
+	sudo mkdir -p $log_dir
 	echo -n "Setting permissions \n"
 	sudo chown -R $USER:$USER $deploy_dir
 
