@@ -11,8 +11,9 @@ fi
 localsiteport=$2
 
 deploy_dir=/var/www/$domain_name/public_html
+log_dir=/var/www/$domain_name/logs
 
-if [ ${#localsite} -eq 0 ]; then
+if [ ${#localsiteport} -eq 0 ]; then
 	echo -n "Creating www dir \n"
 	sudo mkdir -p $deploy_dir
 
@@ -24,13 +25,20 @@ if [ ${#localsite} -eq 0 ]; then
 	echo -n "Copying index.html file \n"
 	sudo cp vhc-includes/index.html $deploy_dir
 	echo -n "Create the New Virtual Host File \n"
-	sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/$domain_name
+	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name
+	echo -n "Activating the new site \n"
+	sudo ln -s ../sites-available/$domain_name 111-80-$domain_name
 	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name \n"
+
 else
 	echo -n "Create the New Virtual Host File \n"
-	sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/$domain_name-$localsiteport
+	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name-$localsiteport
+
+	echo -n "Activating the new site at $domain_name:$localsiteport \n"
+	sudo ln -s ../sites-available/$domain_name 111-$localsiteport-$domain_name
+
 	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name-$localsiteport \n"
 fi
 
 
-#TODO Activate sitesudo a2ensite example.com
+#TODO Activate site sudo a2ensite example.com
