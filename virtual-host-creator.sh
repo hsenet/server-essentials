@@ -25,11 +25,11 @@ if [ ${#localsite} -eq 0 ]; then
 	sudo cp vhc-includes/index.html $deploy_dir
 	echo -n "Create the New Virtual Host File"
 	sudo cp /etc/apache2/sites-available/default /etc/apache2/sites-available/$domain_name
-	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/[$domain_name]"
+	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name"
 else
 	echo -n "Create the New Virtual Host File"
-	sudo cp /etc/apache2/sites-available/default /etc/apache2/sites-available/$domain_name-$localsiteport
-	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/[$domain_name]-[$localsiteport]"
+	sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/$domain_name-$localsiteport
+	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name-$localsiteport"
 fi
 
 
