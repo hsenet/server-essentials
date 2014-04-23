@@ -25,17 +25,17 @@ if [ ${#localsiteport} -eq 0 ]; then
 	echo -n "Copying index.html file \n"
 	sudo cp vhc-includes/index.html $deploy_dir
 	echo -n "Create the New Virtual Host File \n"
-	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name
+	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name.conf
 	echo -n "Activating the new site \n"
-	sudo ln -s /etc/apache2/sites-available/$domain_name /etc/apache2/sites-enabled/111-80-$domain_name
+	sudo ln -s ../sites-available/$domain_name /etc/apache2/sites-enabled/111-80-$domain_name.conf
 	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name \n"
 
 else
 	echo -n "Create the New Virtual Host File \n"
-	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name-$localsiteport
+	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name-$localsiteport.conf
 
 	echo -n "Activating the new site at $domain_name:$localsiteport \n"
-	sudo ln -s /etc/apache2/sites-available/$domain_name-$localsiteport /etc/apache2/sites-enabled/111-$localsiteport-$domain_name
+	sudo ln -s ../sites-available/$domain_name-$localsiteport /etc/apache2/sites-enabled/111-$localsiteport-$domain_name.conf
 
 	echo -n "Please edit the new virtual file at /etc/apache2/sites-available/$domain_name-$localsiteport \n"
 fi
