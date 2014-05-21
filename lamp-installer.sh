@@ -10,3 +10,6 @@ sudo chgrp -R www-data /var/www
 
 echo -n "Give write permissions to the www-data group"
 sudo chmod -R g+w /var/www
+
+echo -n "Enable virtual Hosts"
+sudo a2enmod vhost_alias
