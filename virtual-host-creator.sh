@@ -25,7 +25,7 @@ if [ ${#localsiteport} -eq 0 ]; then
 	echo -n "Copying index.html file \n"
 	sudo cp vhc-includes/index.html $deploy_dir
 	echo -n "Create the New Virtual Host File \n"
-	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name
+	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name.conf
 	
 	#enable site
 	sudo a2ensite $domain_name
