@@ -17,22 +17,14 @@ read -e -p "Enter a new user name to associate with this domain:" -i "admin" use
 deploy_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
 
-if [ ${#user_name} -ne 0 ]; then
-	sudo useradd -m -d $deploy_dir -g www-data $user_name
-fi
-
 cp /dev/null vhc-includes/virtual-host.conf
 
 if [ ${#localsiteport} -eq 0 ]; then
 	echo -e "Creating www dir \n"
-	if [ ${#user_name} -eq 0 ]; then
-		sudo mkdir -p $deploy_dir
-	fi
+	sudo mkdir -p $deploy_dir
 	sudo mkdir -p $log_dir
-	if [ ${#user_name} -eq 0 ]; then
-		echo -e "Setting permissions \n"
-		sudo chown -R $USER:$USER $deploy_dir
-	fi
+	echo -e "Setting permissions \n"
+	sudo chown -R $USER:$USER $deploy_dir
 
 	sudo chmod -R 755 /var/www
 
@@ -69,3 +61,8 @@ echo "Listen $localsiteport
 fi
 echo -e "Reloading apache"
 service apache2 reload
+
+if [ ${#user_name} -ne 0 ]; then
+	sudo useradd -d $deploy_dir -g www-data $user_name
+	sudo chown -R $user_name:www-data $deploy_dir
+fi
