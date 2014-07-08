@@ -15,8 +15,7 @@ user_name=$3
 deploy_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
 
-if [ ${#user_name} -eq 0 ]; then
-else 
+if [ ${#user_name} -ne 0 ]; then
 	useradd -m -d $deploy_dir -g www-data $user_name
 fi
 
