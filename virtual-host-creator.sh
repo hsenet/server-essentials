@@ -2,21 +2,23 @@
 
 #syntax  
 
-domain_name=$1
+read -p "Enter Your Domain Name: " domain_name
+
 if [ ${#domain_name} -eq 0 ]; then
 	echo "Please give a domain name as an argument"
 	exit 1
 fi
 
-localsiteport=$2
+read -p "Enter a site port or press enter: " localsiteport
 
-user_name=$3
+read -e -p "Enter a new user name to associate with this domain:" -i "admin" user_name
+
 
 deploy_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
 
 if [ ${#user_name} -ne 0 ]; then
-	useradd -m -d $deploy_dir -g www-data $user_name
+	sudo useradd -m -d $deploy_dir -g www-data $user_name
 fi
 
 cp /dev/null vhc-includes/virtual-host.conf
@@ -67,9 +69,3 @@ echo "Listen $localsiteport
 fi
 echo -e "Reloading apache"
 service apache2 reload
-
-if [ ${#user_name} -eq 0 ]; then
-fi
-else 
-	useradd -m -d $deploy_dir -g www-user $user_name
-fi
