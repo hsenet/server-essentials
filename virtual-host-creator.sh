@@ -16,7 +16,6 @@ deploy_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
 
 if [ ${#user_name} -eq 0 ]; then
-fi
 else 
 	useradd -m -d $deploy_dir -g www-data $user_name
 fi
@@ -33,7 +32,7 @@ if [ ${#localsiteport} -eq 0 ]; then
 		echo -e "Setting permissions \n"
 		sudo chown -R $USER:$USER $deploy_dir
 	fi
-	
+
 	sudo chmod -R 755 /var/www
 
 	echo -e "Copying index.html file \n"
