@@ -10,24 +10,36 @@ fi
 
 localsiteport=$2
 
+user_name=$3
+
 deploy_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
+
+if [ ${#user_name} -eq 0 ]; then
+fi
+else 
+	useradd -m -d $deploy_dir -g www-data $user_name
+fi
 
 cp /dev/null vhc-includes/virtual-host.conf
 
 if [ ${#localsiteport} -eq 0 ]; then
 	echo -e "Creating www dir \n"
-	sudo mkdir -p $deploy_dir
+	if [ ${#user_name} -eq 0 ]; then
+		sudo mkdir -p $deploy_dir
+	fi
 	sudo mkdir -p $log_dir
-	echo -e "Setting permissions \n"
-	sudo chown -R $USER:$USER $deploy_dir
-
+	if [ ${#user_name} -eq 0 ]; then
+		echo -e "Setting permissions \n"
+		sudo chown -R $USER:$USER $deploy_dir
+	fi
+	
 	sudo chmod -R 755 /var/www
 
 	echo -e "Copying index.html file \n"
 	sudo cp vhc-includes/index.html $deploy_dir
 
-	echo -e "Create the New Virtual Host File \n"
+	echo -e "Create the New Virtual Host File"
 	echo "<VirtualHost *:80>
 	ServerAdmin webmaster@localhost
 	ServerName $domain_name
@@ -38,12 +50,11 @@ if [ ${#localsiteport} -eq 0 ]; then
 </VirtualHost>" >> vhc-includes/virtual-host.conf
 
 	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name.conf
-	
 	#enable site
 	sudo a2ensite $domain_name
 
 else
-	echo -e "Create the New Virtual Host File \n"
+	echo -e "Create the New Virtual Host File "
 echo "Listen $localsiteport
 <VirtualHost *:$localsiteport>
 	ServerAdmin webmaster@localhost
@@ -56,6 +67,11 @@ echo "Listen $localsiteport
 	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name:$localsiteport.conf
 	sudo a2ensite $domain_name:$localsiteport
 fi
+echo -e "Reloading apache"
+service apache2 reload
 
-
-#TODO Activate site sudo a2ensite example.com
+if [ ${#user_name} -eq 0 ]; then
+fi
+else 
+	useradd -m -d $deploy_dir -g www-user $user_name
+fi
