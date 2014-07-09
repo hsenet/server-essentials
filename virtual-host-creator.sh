@@ -20,7 +20,7 @@ else
 	read -e -p "Enter an existing user name to associate with this domain: " -i "admin" user_name
 fi
 
-deploy_dir = /var/www/$domain_name
+deploy_dir=/var/www/$domain_name
 www_dir=/var/www/$domain_name/public_html
 log_dir=/var/www/$domain_name/logs
 
