@@ -70,11 +70,16 @@ fi
 echo -e "Reloading apache"
 service apache2 reload
 
-if [ ${#new_user_name} -eq "y" ]; then
+if [[ $new_user_name =~ ^[Yy]$ ]]; then
+	echo -e "Creating user"
 	sudo useradd -d $deploy_dir -g www-data $user_name
-	passwd $user_name
+	echo -e "Setting password"
+	sudo passwd $user_name
+	echo -e "Setting permissions to user created above ..."
 	sudo chown -R $user_name:www-data $deploy_dir
 	
 else 
 	sudo chown -R $user_name:www-data $deploy_dir
 fi
+
+echo -e "Done!"
