@@ -27,19 +27,19 @@ log_dir=/var/www/$domain_name/logs
 cp /dev/null vhc-includes/virtual-host.conf
 
 if [ ${#localsiteport} -eq 0 ]; then
-	echo -e "Creating www dir \n"
+	echo -e "Creating www dir ..."
 	sudo mkdir -p $deploy_dir
 	sudo mkdir -p $www_dir
 	sudo mkdir -p $log_dir
-	echo -e "Setting permissions \n"
+	echo -e "Setting permissions ..."
 	sudo chown -R $USER:$USER $deploy_dir
 
 	sudo chmod -R 755 /var/www
 
-	echo -e "Copying index.html file \n"
+	echo -e "Copying index.html file ..."
 	sudo cp vhc-includes/index.html $deploy_dir
 
-	echo -e "Create the New Virtual Host File"
+	echo -e "Create the New Virtual Host File ..."
 	echo "<VirtualHost *:80>
 	ServerAdmin webmaster@localhost
 	ServerName $domain_name
@@ -54,7 +54,7 @@ if [ ${#localsiteport} -eq 0 ]; then
 	sudo a2ensite $domain_name
 
 else
-	echo -e "Create the New Virtual Host File "
+	echo -e "Create the New Virtual Host File ..."
 echo "Listen $localsiteport
 <VirtualHost *:$localsiteport>
 	ServerAdmin webmaster@localhost
@@ -67,13 +67,13 @@ echo "Listen $localsiteport
 	sudo cp vhc-includes/virtual-host.conf /etc/apache2/sites-available/$domain_name:$localsiteport.conf
 	sudo a2ensite $domain_name:$localsiteport
 fi
-echo -e "Reloading apache"
+echo -e "Reloading apache ..."
 service apache2 reload
 
 if [[ $new_user_name =~ ^[Yy]$ ]]; then
-	echo -e "Creating user"
+	echo -e "Creating user $user_name ..."
 	sudo useradd -d $deploy_dir -g www-data $user_name
-	echo -e "Setting password"
+	echo -e "Setting password ..."
 	sudo passwd $user_name
 	echo -e "Setting permissions to user created above ..."
 	sudo chown -R $user_name:www-data $deploy_dir
