@@ -11,7 +11,7 @@ fi
 
 read -p "Enter a site port or press enter: " localsiteport
 
-read -e -p "Need a new user name to associate with this domain? [y/n]" new_user_name
+read -r -p "Need a new user name to associate with this domain? [y/n]" new_user_name
 
 
 if [ $new_user_name =~ ^[Yy]$ ]; then
