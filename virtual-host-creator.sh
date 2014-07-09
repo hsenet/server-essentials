@@ -11,13 +11,13 @@ fi
 
 read -p "Enter a site port or press enter: " localsiteport
 
-read -r -p "Need a new user name to associate with this domain? [y/n]" new_user_name
+read -r -p "Need a new user name to associate with this domain? [y/n] " new_user_name
 
 
 if [[ $new_user_name =~ ^[Yy]$ ]]; then
-	read -e -p "Enter a new user name to associate with this domain:" user_name
+	read -e -p "Enter a new user name to associate with this domain: " user_name
 else
-	read -e -p "Enter an existing user name to associate with this domain:" -i "admin" user_name
+	read -e -p "Enter an existing user name to associate with this domain: " -i "admin" user_name
 fi
 
 deploy_dir = /var/www/$domain_name
