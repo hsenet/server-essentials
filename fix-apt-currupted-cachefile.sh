@@ -6,4 +6,4 @@ fi
 
 rm -rf /var/lib/apt/lists/*
 
-apt update && apt upgrade && apt autoremove
+apt update && apt upgrade && apt autoremove && apt clean
