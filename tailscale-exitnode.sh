@@ -30,7 +30,7 @@ then
     echo "Firewall not found. Skipping.."
 fi
 
-sudo tailscale up --advertise-exit-node
+sudo tailscale up --advertise-exit-node --ssh
 
 echo "You can now go to Tailscale Admin > Machines. Locate this machine,  open the Edit route settings panel, and enable the Use as exit node option"
 
