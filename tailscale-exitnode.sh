@@ -36,7 +36,7 @@ fi
 
 # Configure and start Tailscale as exit node
 echo "Setting up Tailscale as exit node..."
-sudo tailscale up --advertise-exit-node --ssh
+sudo tailscale up --advertise-exit-node --ssh --accept-risk=lose-ssh
 
 echo "✅ Setup complete!"
 echo "You can now go to Tailscale Admin > Machines. Locate this machine, open the Edit route settings panel, and enable the Use as exit node option."
