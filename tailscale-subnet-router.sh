@@ -30,6 +30,15 @@ else
     sudo sysctl -p /etc/sysctl.conf
 fi
 
+# Optimize UDP GRO forwarding
+if ! command -v ethtool &> /dev/null; then
+    sudo apt-get update && sudo apt-get install -y ethtool
+fi
+if command -v ethtool &> /dev/null; then
+    INTERFACE=$(ip route | grep default | awk '{print $5}' | head -1)
+    sudo ethtool -K $INTERFACE rx-udp-gro-forwarding on
+fi
+
 # Configure Tailscale as subnet router
 sudo tailscale up --advertise-routes=$SUBNET --ssh
 

@@ -34,6 +34,15 @@ else
     echo "firewall-cmd not found. Skipping firewall configuration."
 fi
 
+# Optimize UDP GRO forwarding
+if ! command -v ethtool &> /dev/null; then
+    sudo apt-get update && sudo apt-get install -y ethtool
+fi
+if command -v ethtool &> /dev/null; then
+    INTERFACE=$(ip route | grep default | awk '{print $5}' | head -1)
+    sudo ethtool -K $INTERFACE rx-udp-gro-forwarding on
+fi
+
 # Configure and start Tailscale as exit node
 echo "Setting up Tailscale as exit node..."
 sudo tailscale up --advertise-exit-node --ssh --accept-risk=lose-ssh
