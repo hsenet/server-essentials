@@ -32,10 +32,20 @@ fi
 # Disk Usage
 DISK_USE=$(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')
 
-echo "----------------------------------------"
-printf " %-12s : %-20s | %-12s : %-20s\n" "Welcome" "$USER" "Local IP" "$LOCAL_IP"
-printf " %-12s : %-20s | %-12s : %-20s\n" "Public IP" "$PUBLIC_IP" "Tailscale" "$TAILSCALE_IP"
-printf " %-12s : %-20s | %-12s : %-20s\n" "CPU Temp" "$CPU_TEMP" "CPU Usage" "$CPU_USE"
-printf " %-12s : %-20s | %-12s : %-20s\n" "Memory" "$MEM_USE" "GPU Usage" "$GPU_USE"
-printf " %-12s : %-20s\n" "Disk Root" "$DISK_USE"
-echo "----------------------------------------"
+# Here's the code to generate it:
+CENTER_TEXT="SYSTEM INFORMATION"
+TOTAL_WIDTH=72
+PADDING=$(( (TOTAL_WIDTH - ${#CENTER_TEXT}) / 2 ))
+LEFT_PAD=$(printf '%*s' $PADDING '')
+RIGHT_PAD=$(printf '%*s' $PADDING '')
+
+echo -e "\e[1;36m╔════════════════════════════════════════════════════════════════════════╗\e[0m"
+echo -e "\e[1;36m║${LEFT_PAD}${CENTER_TEXT}${RIGHT_PAD}║\e[0m"
+echo -e "\e[1;36m╠═══════════════════════════════╦════════════════════════════════════════╣\e[0m"
+printf "\e[1;37m║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "Welcome" "$USER" "Local IP" "$LOCAL_IP"
+printf "\e[1;37m║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "Public IP" "$PUBLIC_IP" "Tailscale" "$TAILSCALE_IP"
+printf "\e[1;37m║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "CPU Temp" "$CPU_TEMP" "CPU Usage" "$CPU_USE"
+printf "\e[1;37m║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "Memory" "$MEM_USE" "GPU Usage" "$GPU_USE"
+echo -e "\e[1;36m╠═══════════════════════════════╩════════════════════════════════════════╣\e[0m"
+printf "\e[1;37m║ %-12s : %-51s ║\e[0m\n" "Disk Root" "$DISK_USE"
+echo -e "\e[1;36m╚════════════════════════════════════════════════════════════════════════╝\e[0m"
