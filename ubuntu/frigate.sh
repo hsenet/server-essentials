@@ -1,4 +1,7 @@
 #!/bin/bash
+# Frigate UI: http://<server-ip>:5000
+# Home Assistant: http://<server-ip>:8123
+# MQTT Broker: mqtt://<server-ip>:1883
 set -e
 
 echo "=== Updating system ==="

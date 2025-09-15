@@ -4,6 +4,14 @@
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 PUBLIC_IP=$(curl -s ifconfig.me)
 
+# Tailscale IP
+if command -v tailscale &> /dev/null; then
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null | head -n1)
+    TAILSCALE_IP="${TAILSCALE_IP:-N/A}"
+else
+    TAILSCALE_IP="N/A"
+fi
+
 # CPU Temp
 CPU_TEMP=$(sensors | awk '/^Package id 0:/ {print $4}')
 
@@ -25,12 +33,9 @@ fi
 DISK_USE=$(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')
 
 echo "----------------------------------------"
-echo " Welcome, $USER"
-echo " Local IP   : $LOCAL_IP"
-echo " Public IP  : $PUBLIC_IP"
-echo " CPU Temp   : $CPU_TEMP"
-echo " CPU Usage  : $CPU_USE"
-echo " Memory     : $MEM_USE"
-echo " GPU Usage  : $GPU_USE"
-echo " Disk Root  : $DISK_USE"
+printf " %-12s : %-20s | %-12s : %-20s\n" "Welcome" "$USER" "Local IP" "$LOCAL_IP"
+printf " %-12s : %-20s | %-12s : %-20s\n" "Public IP" "$PUBLIC_IP" "Tailscale" "$TAILSCALE_IP"
+printf " %-12s : %-20s | %-12s : %-20s\n" "CPU Temp" "$CPU_TEMP" "CPU Usage" "$CPU_USE"
+printf " %-12s : %-20s | %-12s : %-20s\n" "Memory" "$MEM_USE" "GPU Usage" "$GPU_USE"
+printf " %-12s : %-20s\n" "Disk Root" "$DISK_USE"
 echo "----------------------------------------"
