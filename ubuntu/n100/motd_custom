@@ -24,8 +24,20 @@ for iface in $OTHER_INTERFACES; do
     fi
 done
 
-# CPU Temp
-CPU_TEMP=$(sensors | awk '/^Package id 0:/ {print $4}')
+# CPU Temp with color coding for Intel N100
+CPU_TEMP_RAW=$(sensors | awk '/^Package id 0:/ {print $4}' | grep -oE '[0-9]+\.[0-9]+')
+if [ -n "$CPU_TEMP_RAW" ]; then
+    CPU_TEMP_NUM=$(echo "$CPU_TEMP_RAW" | cut -d'.' -f1)
+    if [ "$CPU_TEMP_NUM" -le 60 ]; then
+        CPU_TEMP="\e[1;32m+${CPU_TEMP_RAW}°C\e[1;37m"  # Green (Safe)
+    elif [ "$CPU_TEMP_NUM" -le 75 ]; then
+        CPU_TEMP="\e[1;33m+${CPU_TEMP_RAW}°C\e[1;37m"  # Yellow (Warm)
+    else
+        CPU_TEMP="\e[1;31m+${CPU_TEMP_RAW}°C\e[1;37m"  # Red (Hot)
+    fi
+else
+    CPU_TEMP="N/A"
+fi
 
 # CPU Usage
 CPU_USE=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8"%"}')
@@ -68,7 +80,7 @@ echo -e "\e[90m─────────────────────�
 echo -e "\e[1;33m $UBUNTU_VERSION \e[0m| \e[90m$(hostname)\e[0m"
 echo -e "\e[90m─────────────────────────────────────────────────────────────────────────────\e[0m"
 echo -e " \e[38;5;154m●\e[0m Uptime............: \e[1m$(uptime -p | sed 's/up //')\e[0m"
-echo -e " \e[38;5;154m●\e[0m CPU temp..........: \e[1m$CPU_TEMP\e[0m"
+printf " \e[38;5;154m●\e[0m CPU temp..........: %b\n" "$CPU_TEMP"
 echo -e " \e[38;5;154m●\e[0m CPU usage.........: \e[1m$CPU_USE\e[0m"
 echo -e " \e[38;5;154m●\e[0m Memory usage......: \e[1m$MEM_USE\e[0m"
 echo -e " \e[38;5;154m●\e[0m GPU usage.........: \e[1m$GPU_USE\e[0m"
