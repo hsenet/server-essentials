@@ -32,6 +32,9 @@ fi
 # Disk Usage
 DISK_USE=$(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')
 
+# Updates Available
+UPDATES=$(apt list --upgradable 2>/dev/null | grep -c upgradable)
+
 # Here's the code to generate it:
 CENTER_TEXT="SYSTEM INFORMATION"
 TOTAL_WIDTH=72
@@ -48,4 +51,5 @@ printf "\e[1;37m ║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "CPU Temp" "
 printf "\e[1;37m ║ %-12s : %-14s ║ %-12s : %-14s    ║\e[0m\n" "Memory" "$MEM_USE" "GPU Usage" "$GPU_USE"
 echo -e "\e[1;36m╠═══════════════════════════════╩════════════════════════════════════════╣\e[0m"
 printf "\e[1;37m ║ %-12s : %-51s ║\e[0m\n" "Disk Root" "$DISK_USE"
+printf "\e[1;37m ║ %-12s : %-51s ║\e[0m\n" "Updates" "$UPDATES packages available"
 echo -e "\e[1;36m╚════════════════════════════════════════════════════════════════════════╝\e[0m"
