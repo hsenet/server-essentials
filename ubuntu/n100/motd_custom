@@ -11,15 +11,16 @@ fi
 
 # ZeroTier IP
 if command -v zerotier-cli &> /dev/null; then
-    ZEROTIER_IP=$(zerotier-cli listnetworks | awk 'NR>1 {print $9}' | head -n1)
+    ZEROTIER_IP=$(sudo zerotier-cli listnetworks 2>/dev/null | awk 'NR>1 {print $9}' | head -n1)
 fi
 
 # Other Network Interfaces (excluding lo, eth0, wlan0, tailscale, zerotier)
 OTHER_INTERFACES=$(ip -4 addr show | grep -E '^[0-9]+:' | awk -F': ' '{print $2}' | grep -vE '^(lo|eth0|wlan0|tailscale|zt)' | head -3)
+declare -A IFACE_IPS
 for iface in $OTHER_INTERFACES; do
     iface_ip=$(ip -4 addr show $iface 2>/dev/null | grep inet | awk '{print $2}' | cut -d'/' -f1 | head -n1)
     if [ -n "$iface_ip" ]; then
-        eval "${iface^^}_IP='$iface_ip'"
+        IFACE_IPS["$iface"]="$iface_ip"
     fi
 done
 
@@ -82,10 +83,8 @@ if [ -n "$ZEROTIER_IP" ]; then
 fi
 # Display other interfaces
 for iface in $OTHER_INTERFACES; do
-    iface_var="${iface^^}_IP"
-    iface_ip=$(eval echo \$$iface_var)
-    if [ -n "$iface_ip" ]; then
-        printf " \e[38;5;154m●\e[0m %-14s: \e[1m%s\e[0m\n" "${iface} IP" "$iface_ip"
+    if [ -n "${IFACE_IPS[$iface]}" ]; then
+        printf " \e[38;5;154m●\e[0m %-14s: \e[1m%s\e[0m\n" "${iface} IP" "${IFACE_IPS[$iface]}"
     fi
 done
 printf " \e[38;5;154m●\e[0m Updates...........: %b packages available\n" "$UPDATES_COLOR"
