@@ -7,10 +7,21 @@ PUBLIC_IP=$(curl -s ifconfig.me)
 # Tailscale IP
 if command -v tailscale &> /dev/null; then
     TAILSCALE_IP=$(tailscale ip -4 2>/dev/null | head -n1)
-    TAILSCALE_IP="${TAILSCALE_IP:-N/A}"
-else
-    TAILSCALE_IP="N/A"
 fi
+
+# ZeroTier IP
+if command -v zerotier-cli &> /dev/null; then
+    ZEROTIER_IP=$(zerotier-cli listnetworks | awk 'NR>1 {print $9}' | head -n1)
+fi
+
+# Other Network Interfaces (excluding lo, eth0, wlan0, tailscale, zerotier)
+OTHER_INTERFACES=$(ip -4 addr show | grep -E '^[0-9]+:' | awk -F': ' '{print $2}' | grep -vE '^(lo|eth0|wlan0|tailscale|zt)' | head -3)
+for iface in $OTHER_INTERFACES; do
+    iface_ip=$(ip -4 addr show $iface 2>/dev/null | grep inet | awk '{print $2}' | cut -d'/' -f1 | head -n1)
+    if [ -n "$iface_ip" ]; then
+        eval "${iface^^}_IP='$iface_ip'"
+    fi
+done
 
 # CPU Temp
 CPU_TEMP=$(sensors | awk '/^Package id 0:/ {print $4}')
@@ -63,7 +74,20 @@ echo -e " \e[38;5;154m●\e[0m GPU usage.........: \e[1m$GPU_USE\e[0m"
 echo -e " \e[38;5;154m●\e[0m Disk usage (/)....: \e[1m$DISK_USE\e[0m"
 echo -e " \e[38;5;154m●\e[0m Local IP..........: \e[1m$LOCAL_IP\e[0m"
 echo -e " \e[38;5;154m●\e[0m Public IP.........: \e[1m$PUBLIC_IP\e[0m"
-echo -e " \e[38;5;154m●\e[0m Tailscale IP......: \e[1m$TAILSCALE_IP\e[0m"
+if [ -n "$TAILSCALE_IP" ]; then
+    echo -e " \e[38;5;154m●\e[0m Tailscale IP......: \e[1m$TAILSCALE_IP\e[0m"
+fi
+if [ -n "$ZEROTIER_IP" ]; then
+    echo -e " \e[38;5;154m●\e[0m ZeroTier IP.......: \e[1m$ZEROTIER_IP\e[0m"
+fi
+# Display other interfaces
+for iface in $OTHER_INTERFACES; do
+    iface_var="${iface^^}_IP"
+    iface_ip=$(eval echo \$$iface_var)
+    if [ -n "$iface_ip" ]; then
+        printf " \e[38;5;154m●\e[0m %-14s: \e[1m%s\e[0m\n" "${iface} IP" "$iface_ip"
+    fi
+done
 printf " \e[38;5;154m●\e[0m Updates...........: %b packages available\n" "$UPDATES_COLOR"
 printf " \e[38;5;154m●\e[0m OS Status.........: %b\n" "$OS_UPDATE_STATUS"
 echo -e "\e[90m─────────────────────────────────────────────────────────────────────────────\e[0m"
