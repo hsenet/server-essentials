@@ -1,0 +1,22 @@
+version: '3.3'
+
+volumes:
+  portainer_data:
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      # The main Portainer web UI port (HTTPS)
+      - "9443:9443"
+      # The legacy HTTP port (redirects to 9443)
+      - "9000:9000"
+      # The Edge agent port (optional, only needed for remote environments)
+      - "8000:8000"
+    volumes:
+      # Stores Portainer's database and settings
+      - /home/adminuser/portainer_data:/data
+      # Gives Portainer access to manage the local Docker host
+      - /var/run/docker.sock:/var/run/docker.sock

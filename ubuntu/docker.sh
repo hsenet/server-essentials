@@ -15,12 +15,19 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
-# 3. Edge TPU
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/coral-edgetpu.gpg
-echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/coral-edgetpu.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
-  sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-sudo apt update
-sudo apt install -y libedgetpu1-std python3-pycoral
-sudo usermod -aG plugdev $USER
+# 3. Install Docker Compose standalone
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
-echo "Setup complete. Please reboot to apply group changes."
+# 4. Copy portainer folder to home directory
+cp -r portainer $HOME/
+chown -R $USER:$USER $HOME/portainer
+
+# 5. Start Portainer from home directory
+cd $HOME/portainer
+docker-compose up -d
+
+echo "Docker and Portainer installed successfully!"
+echo "Portainer folder copied to: $HOME/portainer"
+echo "Access Portainer at: http://$(hostname -I | awk '{print $1}'):9000"
+
