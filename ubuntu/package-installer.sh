@@ -69,6 +69,8 @@ home_automation() {
 ai_surveillance() {
     OPTIONS=(
         "frigate" "Frigate NVR (Docker)" OFF
+        "motioneye" "MotionEye Surveillance (Docker)" OFF
+        "zoneminder" "ZoneMinder NVR" OFF
     )
     run_installer "AI / Surveillance" "${OPTIONS[@]}"
 }
@@ -137,6 +139,21 @@ run_installer() {
                     -p 5000:5000 \
                     -p 1935:1935 \
                     blakeblackshear/frigate:stable
+                ;;
+            "\"motioneye\"")
+                sudo docker run -d \
+                    --name motioneye \
+                    --restart=unless-stopped \
+                    -p 8765:8765 \
+                    -v /etc/localtime:/etc/localtime:ro \
+                    -v /PATH/TO/CONFIG:/etc/motioneye \
+                    -v /PATH/TO/MEDIA:/var/lib/motioneye \
+                    ccrisan/motioneye:master-amd64
+                ;;
+            "\"zoneminder\"")
+                sudo apt install -y zoneminder
+                sudo systemctl enable zoneminder
+                sudo systemctl start zoneminder
                 ;;
             "\"fail2ban\"") sudo apt install -y fail2ban ;;
             "\"ufw\"") sudo apt install -y ufw && sudo ufw enable ;;
