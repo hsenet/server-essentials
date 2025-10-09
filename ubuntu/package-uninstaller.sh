@@ -20,6 +20,8 @@ OPTIONS=(
     "nodejs" "Node.js Runtime" OFF
     "python3" "Python 3 Runtime" OFF
     "frigate" "Frigate NVR (Docker)" OFF
+    "motioneye" "MotionEye Surveillance (Docker)" OFF
+    "zoneminder" "ZoneMinder NVR" OFF
     "fail2ban" "Brute-force Protection" OFF
     "ufw" "Uncomplicated Firewall" OFF
 )
@@ -44,6 +46,8 @@ for choice in "${CHOICES[@]}"; do
         "\"nodejs\"") sudo apt remove --purge -y nodejs ;;
         "\"python3\"") sudo apt remove --purge -y python3 python3-pip ;;
         "\"frigate\"") sudo docker rm -f frigate && sudo docker volume rm frigate-config ;;
+        "\"motioneye\"") sudo docker rm -f motioneye ;;
+        "\"zoneminder\"") sudo systemctl stop zoneminder && sudo systemctl disable zoneminder && sudo apt remove --purge -y zoneminder ;;
         "\"fail2ban\"") sudo apt remove --purge -y fail2ban ;;
         "\"ufw\"") sudo apt remove --purge -y ufw ;;
     esac
