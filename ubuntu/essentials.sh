@@ -74,4 +74,5 @@ if [[ $install_zram =~ ^[Yy]$ ]]; then
     sudo systemctl enable zram-config
     
     echo "zram configured successfully with 50% of RAM and lz4 compression"
+    zramctl
 fi
