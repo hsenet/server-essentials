@@ -113,14 +113,20 @@ if [[ $install_zram =~ ^[Yy]$ ]]; then
             sudo apt update
             sudo apt install -y zram-tools
             
-            # Configure zram manually
+            # Disable existing zram if active
+            sudo swapoff /dev/zram0 2>/dev/null || true
+            echo 1 | sudo tee /sys/block/zram0/reset > /dev/null 2>&1 || true
+            
+            # Configure zram
             echo 'lz4' | sudo tee /sys/block/zram0/comp_algorithm > /dev/null
             echo $(($(free -b | awk '/^Mem:/{print $2}') / 2)) | sudo tee /sys/block/zram0/disksize > /dev/null
             sudo mkswap /dev/zram0
             sudo swapon /dev/zram0
-
-            # Make persistent
-            echo '/dev/zram0 none swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
+            
+            # Make persistent if not already in fstab
+            if ! grep -q '/dev/zram0' /etc/fstab; then
+                echo '/dev/zram0 none swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
+            fi
             ;;
         *)
             echo "Unsupported OS for zram installation"
