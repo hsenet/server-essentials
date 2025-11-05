@@ -111,13 +111,16 @@ if [[ $install_zram =~ ^[Yy]$ ]]; then
             ;;
         "raspberrypi"|"debian"|"ubuntu")
             sudo apt update
-            sudo apt install -y zram-config
+            sudo apt install -y zram-tools
             
-            sudo systemctl stop zram-config
-            echo "PERCENT=50" | sudo tee /etc/default/zramswap > /dev/null
-            echo "ALGO=lz4" | sudo tee -a /etc/default/zramswap > /dev/null
-            sudo systemctl start zram-config
-            sudo systemctl enable zram-config
+            # Configure zram manually
+            echo 'lz4' | sudo tee /sys/block/zram0/comp_algorithm > /dev/null
+            echo $(($(free -b | awk '/^Mem:/{print $2}') / 2)) | sudo tee /sys/block/zram0/disksize > /dev/null
+            sudo mkswap /dev/zram0
+            sudo swapon /dev/zram0
+
+            # Make persistent
+            echo '/dev/zram0 none swap defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
             ;;
         *)
             echo "Unsupported OS for zram installation"
