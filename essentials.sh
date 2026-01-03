@@ -73,6 +73,8 @@ if [[ $install_tailscale =~ ^[Yy]$ ]]; then
         else
             echo "Error: tailscale-exitnode.sh not found"
         fi
+    else
+        sudo tailscale up --ssh --accept-risk=lose-ssh
     fi
 fi
 

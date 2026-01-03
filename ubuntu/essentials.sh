@@ -38,6 +38,8 @@ if [[ $configure_exitnode =~ ^[Yy]$ ]]; then
     else
         echo "Error: tailscale-exitnode.sh not found in parent directory"
     fi
+else
+    sudo tailscale up --ssh --accept-risk=lose-ssh
 fi
 
 # Ask user if they want to install ZeroTier
