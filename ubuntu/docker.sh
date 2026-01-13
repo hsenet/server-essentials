@@ -1,6 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Check if running with sudo
+if [[ $EUID -eq 0 && -n "${SUDO_USER:-}" ]]; then
+    echo "Error: Do not run this script with sudo. Run as regular user."
+    echo "Usage: ./docker.sh"
+    exit 1
+fi
+
+# Warn if running as root
+if [[ $EUID -eq 0 && -z "${SUDO_USER:-}" ]]; then
+    echo "Warning: Running as root user. Continue? (y/n)"
+    read -r response
+    if [[ ! $response =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
 # 1. Update
 sudo apt update && sudo apt upgrade -y
 
