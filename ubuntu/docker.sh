@@ -41,7 +41,7 @@ chown -R $USER:$USER $HOME/portainer
 
 # 5. Start Portainer from home directory
 cd $HOME/portainer
-docker-compose up -d
+sudo docker-compose up -d
 
 echo "Docker and Portainer installed successfully!"
 echo "Portainer folder copied to: $HOME/portainer"
