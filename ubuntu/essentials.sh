@@ -78,3 +78,11 @@ if [[ $install_zram =~ ^[Yy]$ ]]; then
     echo "zram configured successfully with 50% of RAM and lz4 compression"
     zramctl
 fi
+
+# Ask user if they want to install unattended-upgrades
+read -p "Do you want to install unattended-upgrades for automatic security updates? (y/n): " install_unattended
+if [[ $install_unattended =~ ^[Yy]$ ]]; then
+    echo "Installing unattended-upgrades..."
+    sudo apt update && sudo apt -y install unattended-upgrades update-notifier-common
+    sudo dpkg-reconfigure -plow unattended-upgrades
+fi
