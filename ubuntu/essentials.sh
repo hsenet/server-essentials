@@ -86,3 +86,26 @@ if [[ $install_unattended =~ ^[Yy]$ ]]; then
     sudo apt update && sudo apt -y install unattended-upgrades update-notifier-common
     sudo dpkg-reconfigure -plow unattended-upgrades
 fi
+
+# Ask user if they want to setup custom auto-update script
+read -p "Do you want to setup a custom auto-update and reboot script? (y/n): " setup_autoupdate
+if [[ $setup_autoupdate =~ ^[Yy]$ ]]; then
+    read -p "Enter the hour to run updates (0-23, default 0): " update_hour
+    update_hour=${update_hour:-0}
+    read -p "Enter the minute to run updates (0-59, default 0): " update_minute
+    update_minute=${update_minute:-0}
+
+    echo "Setting up auto-update script..."
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+    if [[ -f "$SCRIPT_DIR/auto-update.sh" ]]; then
+        sudo cp "$SCRIPT_DIR/auto-update.sh" /usr/local/bin/auto-update.sh
+        sudo chmod +x /usr/local/bin/auto-update.sh
+
+        # Add to crontab, replacing any existing entry for this script
+        CRON_JOB="$update_minute $update_hour * * * /usr/local/bin/auto-update.sh"
+        (sudo crontab -l 2>/dev/null | grep -v "/usr/local/bin/auto-update.sh" ; echo "$CRON_JOB") | sudo crontab -
+        echo "Auto-update scheduled for $update_hour:$update_minute daily."
+    else
+        echo "Error: auto-update.sh not found in $SCRIPT_DIR"
+    fi
+fi
