@@ -7,16 +7,28 @@ if [[ $install_speedtest =~ ^[Yy]$ ]]; then
     
     # Check if snap is available
     if command -v snap >/dev/null 2>&1; then
-        sudo snap install speedtest
+        if ! sudo snap install speedtest; then
+            echo "Error: Failed to install speedtest via snap"
+            exit 1
+        fi
     else
         echo "Snap not available. Installing speedtest via apt..."
-        curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-        sudo apt update
+        if ! curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash; then
+            echo "Error: Failed to setup speedtest repository"
+            exit 1
+        fi
+        if ! sudo apt update; then
+            echo "Error: Failed to update apt package list"
+            exit 1
+        fi
         if sudo apt install -y speedtest; then
             echo "Speedtest installed successfully"
         else
             echo "Speedtest package not available. Installing speedtest-cli..."
-            sudo apt install -y speedtest-cli
+            if ! sudo apt install -y speedtest-cli; then
+                echo "Error: Failed to install speedtest-cli"
+                exit 1
+            fi
         fi
     fi
 fi
@@ -25,7 +37,10 @@ fi
 read -p "Do you want to install Tailscale? (y/n): " install_tailscale
 if [[ $install_tailscale =~ ^[Yy]$ ]]; then
     echo "Installing Tailscale..."
-    curl -fsSL https://tailscale.com/install.sh | sh
+    if ! curl -fsSL https://tailscale.com/install.sh | sh; then
+        echo "Error: Failed to install Tailscale"
+        exit 1
+    fi
 fi
 
 # Ask user if they want to configure Tailscale as exit node
@@ -39,6 +54,7 @@ if [[ $configure_exitnode =~ ^[Yy]$ ]]; then
         echo "Error: tailscale-exitnode.sh not found in parent directory"
     fi
 else
+    # Only run this command if user doesn't want to configure as exit node
     sudo tailscale up --ssh --accept-risk=lose-ssh
 fi
 
@@ -46,10 +62,16 @@ fi
 read -p "Do you want to install ZeroTier? (y/n): " install_zerotier
 if [[ $install_zerotier =~ ^[Yy]$ ]]; then
     echo "Installing ZeroTier..."
-    curl -s https://install.zerotier.com | sudo bash
+    if ! curl -s https://install.zerotier.com | sudo bash; then
+        echo "Error: Failed to install ZeroTier"
+        exit 1
+    fi
     read -p "Enter ZeroTier network ID to join (or press Enter to skip): " network_id
     if [[ -n $network_id ]]; then
-        sudo zerotier-cli join $network_id
+        if ! sudo zerotier-cli join $network_id; then
+            echo "Error: Failed to join ZeroTier network"
+            exit 1
+        fi
         echo "Joined ZeroTier network: $network_id"
     fi
 fi
@@ -58,12 +80,20 @@ fi
 read -p "Do you want to install and configure zram for memory compression (Extends life of SSDs)? (y/n): " install_zram
 if [[ $install_zram =~ ^[Yy]$ ]]; then
     echo "Installing zram..."
-    sudo apt update
-    sudo apt install -y zram-config
+    if ! sudo apt update; then
+        echo "Error: Failed to update apt package list"
+        exit 1
+    fi
+    if ! sudo apt install -y zram-config; then
+        echo "Error: Failed to install zram-config"
+        exit 1
+    fi
     
     # Configure optimal zram settings
     echo "Configuring zram..."
-    sudo systemctl stop zram-config
+    if ! sudo systemctl stop zram-config; then
+        echo "Warning: Failed to stop zram-config service"
+    fi
     
     # Set zram size to 50% of RAM
     total_ram=$(free -b | awk '/^Mem:/{print $2}')
@@ -72,8 +102,14 @@ if [[ $install_zram =~ ^[Yy]$ ]]; then
     echo "PERCENT=50" | sudo tee /etc/default/zramswap > /dev/null
     echo "ALGO=lz4" | sudo tee -a /etc/default/zramswap > /dev/null
     
-    sudo systemctl start zram-config
-    sudo systemctl enable zram-config
+    if ! sudo systemctl start zram-config; then
+        echo "Error: Failed to start zram-config service"
+        exit 1
+    fi
+    if ! sudo systemctl enable zram-config; then
+        echo "Error: Failed to enable zram-config service"
+        exit 1
+    fi
     
     echo "zram configured successfully with 50% of RAM and lz4 compression"
     zramctl
@@ -92,8 +128,19 @@ read -p "Do you want to setup a custom auto-update and reboot script? (y/n): " s
 if [[ $setup_autoupdate =~ ^[Yy]$ ]]; then
     read -p "Enter the hour to run updates (0-23, default 0): " update_hour
     update_hour=${update_hour:-0}
+    # Validate hour input
+    if ! [[ "$update_hour" =~ ^[0-9]+$ ]] || [ "$update_hour" -lt 0 ] || [ "$update_hour" -gt 23 ]; then
+        echo "Error: Invalid hour. Please enter a number between 0 and 23."
+        exit 1
+    fi
+    
     read -p "Enter the minute to run updates (0-59, default 0): " update_minute
     update_minute=${update_minute:-0}
+    # Validate minute input
+    if ! [[ "$update_minute" =~ ^[0-9]+$ ]] || [ "$update_minute" -lt 0 ] || [ "$update_minute" -gt 59 ]; then
+        echo "Error: Invalid minute. Please enter a number between 0 and 59."
+        exit 1
+    fi
 
     echo "Setting up auto-update script..."
     SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"

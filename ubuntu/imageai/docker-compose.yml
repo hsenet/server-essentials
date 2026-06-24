@@ -1,0 +1,51 @@
+services:
+  facefusion:
+    image: facefusion/facefusion-cuda:latest
+    container_name: facefusion
+    restart: unless-stopped
+    ports:
+      - "7865:7865"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  iopaint:
+    image: sanster/iopaint:latest
+    container_name: iopaint
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    volumes:
+      - iopaint_models:/root/.cache
+    # We use the 'lama' model by default as it is the best for removing objects
+    command: iopaint start --model=lama --device=cuda --host=0.0.0.0 --port=8080
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  upscayl:
+    image: ghcr.io/upscayl/upscayl-server:latest
+    container_name: upscayl
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  iopaint_models:
